@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <title>Flowchart Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="bootstrap/united/bootstrap.css" rel="stylesheet">
+  <style type="text/css">
+      body {
+        padding-top: 120px; 
+				padding-bottom:0px;
+      }
+      #view {
+        height: 500px;
+        overflow: scroll;
+    } 
+    </style>
+  <script src="js/AIRAliases.js" type="text/javascript"></script>
+  <script src="js/FlowchartFunctions.js" type="text/javascript"></script>
+  <script src="js/jquery-1.8.2.js" type="text/javascript"></script>
+	<script src="js/joint.all.min.js" type="text/javascript" ></script>
+  <script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <ul class="nav" role="navigation">
+      <li class="dropdown">
+        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> File</a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+            <li><a tabindex="-1" href="#" onClick="newfile();">
+              <i class="icon-file"></i> New</a></li>
+            <li class="divider"></li>
+            <li><a tabindex="-1" href="#" onClick="openfile();">
+              <i class="icon-folder-open"></i> Open</a></li>
+						<li class="dropdown-submenu">
+							<a tabindex="-1" href="#myRecentFiles" data-toggle="modal">
+							<i class="icon-folder-open"></i> Open Recent</a>
+						</li> 
+						<ul id="ddlRecent" class="dropdown-menu">
+							<li></li>
+						</ul>
+						<li><a tabindex="-1" href="#" onClick="savefile();">
+              <i class="icon-download-alt"></i> Save</a></li>
+            <li><a tabindex="-1" href="#" onClick="saveAsfile();">
+              <i class="icon-download-alt"></i> Save As</a></li>
+            <li class="divider"></li>						
+            <li><a tabindex="-1" href="#" onClick="exit();">
+              <i class="icon-remove"></i> Exit</a></li>
+        </ul>
+       </li>
+			<li class="dropdown" id="dropdownEdit">
+				<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> Edit</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+					<li><a tabindex="-1" href="#EditNode" data-toggle="modal">
+						<i class="icon-tasks"></i> Edit Node</a>
+					</li>
+					<li><a tabindex="-1" href="#EditLink" data-toggle="modal">
+						<i class="icon-tasks"></i> Edit Link</a>
+					</li>										
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> Add</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+					<li><a tabindex="-1" href="#AddNode" data-toggle="modal">
+						<i class="icon-tasks"></i> Add Node</a>
+					</li>
+					<li><a tabindex="-1" href="#AddLink" data-toggle="modal">
+						<i class="icon-tasks"></i> Add Link</a>
+					</li>				
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> Delete</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+					<li><a tabindex="-1" href="#DeleteNode" data-toggle="modal">
+						<i class="icon-tasks"></i> Delete Node</a>
+					</li>
+					<li><a tabindex="-1" href="#DeleteLink" data-toggle="modal">
+						<i class="icon-tasks"></i> Delete Link</a>
+					</li>			
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> Replace</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+					<li><a tabindex="-1" href="#myModal" data-toggle="modal">
+						<i class="icon-tasks"></i> Replace</a>
+					</li>
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> Help</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+					<li><a tabindex="-1" href="#Help" data-toggle="modal">
+						<i class="icon-tasks"></i> Show Help</a>
+					</li>
+				</ul>
+			</li>
+    </ul>
+  </div>
+	<div class="navbar-inner">
+    <ul class="nav">
+			<li>&nbsp &nbsp &nbsp &nbsp</li>
+			<li><a href="#" rel="tooltip" title="Represents the beginning of the xml file" onclick="drawBegin();"><img width="30" height="30" src="icons/begin.png"> Begin</a></li>
+			<li><a href="#" rel="tooltip" title="Represents the start process" onclick="drawStart();"><img width="30" height="30" src="icons/start.png"> Start</a></li>
+			<li><a href="#" rel="tooltip" title="Represents a process" onclick="drawBlock();"><img width="30" height="30" src="icons/block.png"> Block</a></li>	
+			<li><a href="#" rel="tooltip" title="Represents the end process" onclick="drawEnd();"><img width="30" height="30" src="icons/end.png"> End</a></li>
+			<li><a href="#" rel="tooltip" title="Represents a decision" onclick="drawDecision();"><img width="30" height="30" src="icons/rombo.png"> Decision</a></li>
+			<li><a href="#" rel="tooltip" title="Represents conexion between two elements" onclick="drawLink();"><img width="30" height="30" src="icons/Arrow.png"> Link</a></li>
+			<li><a href="#" rel="tooltip" title="Represents the end of the xml file" onclick="drawFinish();"><img width="30" height="30" src="icons/finish.png"> Finish</a></li>
+			<li><a href="#" rel="tooltip" title="Represents the creation of a new xml file" onclick="newfile();"><img width="30" height="30" src="icons/new.png"> New</a></li>
+			<li><a href="#" rel="tooltip" title="Open a flowchart xml file" onclick="openfile();"><img width="30" height="30" src="icons/open.png"> Open</a></li>
+			<li><a href="#" rel="tooltip" title="Save the actual flowchart xml file" onclick="savefile();"><img width="30" height="30" src="icons/save.png"> Save</a></li>
+			<li><a href="#" rel="tooltip" title="Save with a given name and path, the actual flowchart xml file" onclick="saveAsfile();"><img width="30" height="30" src="icons/save_as.png"> Save As</a></li>
+    </ul>
+	</div>
+</div>
+
+<!-- Help Modal -->
+<div id="Help" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Help</h3>
+  </div>
+  <div class="modal-body">
+		<div class="row-fluid">
+			<div class="span12" align="left">
+				<h4>Descripcion del contenido a desplegar</h4><br>
+				<p align="justify">--------------------------------------------------</p>
+				<p align="justify">Simbolo	-> Figura</p>
+				<p align="justify">Inicio	-> Rectangulo redondeado</p>
+				<p align="justify">Fin	-> Rectangulo redondeado</p>
+				<p align="justify">Flujo de control	-> Flechas</p>
+				<p align="justify">Pasos de proceso genericos	-> Rectangulo</p>
+				<p align="justify">Paso de decision 	-> Rombo</p>
+				<p align="justify">--------------------------------------------------</p><br>
+				<h4>Funciones de la barra de botones</h4><br>
+				<p align="justify">Begin: agrega el tag flowchart al editor.</p>
+				<p align="justify">Finish: agrega el tag de cierre del flowchart que representa el fin del flowchart.</p>
+				<p align="justify">Start: agrega la secuencia de tags que representan un nodo Start.</p>
+				<p align="justify">Block: agrega la secuencia de tags que representan un nodo Block.</p>
+				<p align="justify">Decision: agrega la secuencia de tags que representan un nodo Decision.</p>
+				<p align="justify">End: agrega la secuencia de tags que representan un nodo End.</p>
+				<p align="justify">Link: agrega la secuencia de tags que representan un nodo Link.</p>
+				<p align="justify">New: crea un nuevo archivo en el editor.</p>
+				<p align="justify">Open: abre un archivo para desplegar en el visualizador.</p>
+				<p align="justify">Save: guarda  las modificaciones hechas en el archivo actual.</p>
+				<p align="justify">Save As: guarda el archivo con el nombre especificado por el usuario.</p><br>
+				<h4>Funciones de menu y manejo de archivos</h4><br>
+				<h5>File</h5>
+				<p align="justify">New: crea un nuevo archivo en el editor.</p>
+				<p align="justify">Open: abre un archivo para desplegar en el visualizador.</p>
+				<p align="justify">Open Recent: abre un archivo de la lista de archivos recientes para desplegar en el visualizador.</p>
+				<p align="justify">Save As: guarda el archivo con el nombre especificado por el usuario.</p>
+				<p align="justify">Save: guarda  las modificaciones hechas en el archivo actual.</p>
+				<p align="justify">Exit: finaliza y cierra la aplicacion.</p><br>
+				<h5>Edit</h5>
+				<p align="justify">Edit Node: funcion que se encarga de editar nodos del tipo Start, End, Block y Decision.</p>
+				<p align="justify">Edit Link: funcion que se encarga de editar nodos del tipo Link.</p><br>
+				<h5>Add</h5>
+				<p align="justify">Add Node: funcion que se encarga de agregar nodos del tipo Start, End, Block y Decision.</p>
+				<p align="justify">Add Link: funcion que se encarga de agregar nodos del tipo Link.</p><br>
+				<h5>Delete</h5>
+				<p align="justify">Delete Node: funcion que se encarga de eliminar nodos del tipo Start, End, Block y Decision.</p>
+				<p align="justify">Delete Link: funcion que se encarga de eliminar nodos del tipo Link.</p><br>
+				<h5>Replace</h5>
+				<p align="justify">Replace: reemplaza la primera aparicion que se encuentre en el textarea segun los parametros dados en el modal de replace.</p>
+				<p align="justify">Replace All: reemplaza todas las apariciones que se encuentre en el textarea segun los parametros dados en el modal de replace.</p><br>
+				<h4>Ejemplos de datos a utilizar como pruebas</h4><br>
+				<h5>Odd or Even Number? Flowchart</h4><br>
+				<img src="../../tests/Flowchart03_OddEven.png" align="justify" ></img><br>
+				<br><h5>Odd or Even Number? Flowchart XML</h5><br>
+				<textarea rows="24" class="span12 well" align="justify" readonly>
+<flowchart>
+	<start>
+					<id>s01</id>
+					<label>int x = number</label>
+					<color>lightgreen</color>
+					<x>200</x>
+					<y>5</y>
+					<width>140</width>
+					<height>60</height>
+		</start>
+		<block>
+					<id>b01</id>
+					<label>int y = x%2</label>
+					<color>pink</color>
+					<x>200</x>
+					<y>110</y>
+					<width>140</width>
+					<height>60</height>
+		</block>
+		<decision>
+					<id>d01</id>
+					<label>if(y==0)</label>
+					<color>white</color>			
+					<x>230</x>
+					<y>230</y>
+					<width>70</width>
+					<height>70</height>
+		</decision>
+				<end>
+					<id>e01</id>
+					<label>return "Even"</label>
+					<color>lightblue</color>			
+					<x>400</x>
+					<y>230</y>
+					<width>140</width>
+					<height>60</height>
+				</end>
+				<end>
+					<id>e02</id>
+					<label>return "Odd"</label>
+					<color>lightblue</color>			
+					<x>200</x>
+					<y>390</y>
+					<width>140</width>
+					<height>60</height>
+				</end>
+				<link>
+					<id>l1</id>
+					<source>s01</source>
+					<destiny>b01</destiny>
+					<color>red</color>
+				</link>
+				<link>
+					<id>l2</id>
+					<source>b01</source>
+					<destiny>d01</destiny>
+					<color>red</color>
+				</link>
+				<link>
+					<id>l3</id>
+					<source>d01</source>
+					<destiny>e01</destiny>
+					<label>true</label>
+					<color>red</color>
+				</link>
+				<link>
+					<id>l4</id>
+					<source>d01</source>
+					<destiny>e02</destiny>
+					<label>false</label>
+					<color>red</color>
+				</link>
+</flowchart>
+				</textarea>
+				<br><h5>Lamp Flowchart</h4><br>
+				<img src="../../tests/Flowchart01_Lamp.png" align="justify" ></img><br>
+				<br><h5>Lamp Flowchart XML</h5><br>
+				<textarea rows="24" class="span12 well" align="justify" readonly>
+<flowchart>
+	<start>
+				<id>s01</id>
+				<label>Lamp doesn't work</label>
+				<color>pink</color>
+				<x>200</x>
+				<y>5</y>
+				<width>140</width>
+				<height>60</height>
+	</start>
+	<decision>
+				<id>d01</id>
+				<label>Lamp plugged in?</label>
+				<color>yellow</color>			
+				<x>230</x>
+				<y>110</y>
+				<width>70</width>
+				<height>70</height>
+	</decision>
+			<end>
+				<id>e01</id>
+				<label>Plug in lamp</label>
+				<color>lightgreen</color>			
+				<x>400</x>
+				<y>110</y>
+				<width>140</width>
+				<height>60</height>
+													</end>
+			<decision>
+				<id>d02</id>
+				<label>Bulb burned out?</label>
+				<color>yellow</color>			
+				<x>230</x>
+				<y>255</y>
+				<width>70</width>
+				<height>70</height>
+													</decision>
+			<end>
+				<id>e02</id>
+				<label>Replace bulb</label>
+				<color>lightgreen</color>			
+				<x>400</x>
+				<y>255</y>
+				<width>140</width>
+				<height>60</height>
+													</end>
+	<end>
+				<id>e03</id>
+				<label>Repair lamp</label>
+				<color>lightgreen</color>			
+				<x>200</x>
+				<y>390</y>
+				<width>140</width>
+				<height>60</height>
+	</end>
+			<link>
+				<id>l1</id>
+				<source>s01</source>
+				<destiny>d01</destiny>
+				<color>magenta</color>
+			</link>
+			<link>
+				<id>l2</id>
+				<source>d01</source>
+				<destiny>d02</destiny>
+				<label>Yes</label>
+				<color>red</color>
+			</link>
+			<link>
+				<id>l3</id>
+				<source>d01</source>
+				<destiny>e01</destiny>
+				<label>No</label>
+				<color>steelblue</color>
+			</link>
+			<link>
+				<id>l4</id>
+				<source>d02</source>
+				<destiny>e02</destiny>
+				<label>Yes</label>
+				<color>gold</color>
+			</link>
+			<link>
+				<id>l5</id>
+				<source>d02</source>
+				<destiny>e03</destiny>
+				<label>No</label>
+				<color>darkcyan</color>
+			</link>				
+	</flowchart>
+					</textarea>
+				<br><h5>Simple Flowchart</h4><br>
+				<img src="../../tests/Flowchart02.png" align="justify" ></img><br>
+				<br><h5>Simple Flowchart XML</h5><br>
+					<textarea rows="24" class="span12 well" align="justify" readonly>
+<flowchart>
+	<start>
+		<id>s01</id>
+		<label>Start</label>
+		<color>pink</color>
+		<x>200</x>
+		<y>5</y>
+		<width>140</width>
+		<height>60</height>
+	</start>
+	<block>
+		<id>b01</id>
+		<label>Block</label>
+		<color>steelblue</color>
+		<x>200</x>
+		<y>240</y>
+		<width>140</width>
+		<height>60</height>
+	</block>
+	<end>
+		<id>e01</id>
+		<label>End</label>
+		<color>lightgreen</color>
+		<x>400</x>
+		<y>110</y>
+		<width>140</width>
+		<height>60</height>
+	</end>
+	<end>
+		<id>e02</id>
+		<label>End</label>
+		<color>lightgreen</color>
+		<x>200</x>
+		<y>350</y>
+		<width>140</width>
+		<height>60</height>
+	</end>
+	<decision>
+		<id>d01</id>
+		<label>Decision</label>
+		<color>yellow</color>
+		<x>230</x>
+		<y>110</y>
+		<width>70</width>
+		<height>70</height>
+	</decision>
+	<link>
+		<id>l1</id>
+		<source>d01</source>
+		<destiny>e01</destiny>
+		<label>Yes</label>
+		<color>red</color>
+	</link>
+	<link>
+		<id>l2</id>
+		<source>s01</source>
+		<destiny>d01</destiny>
+		<color>red</color>
+	</link>
+	<link>
+		<id>l3</id>
+		<source>d01</source>
+		<destiny>b01</destiny>
+		<label>No</label>
+		<color>red</color>
+	</link>
+	<link>
+		<id>l4</id>
+		<source>b01</source>
+		<destiny>e02</destiny>
+		<color>red</color>
+	</link>
+</flowchart>
+					</textarea>
+			</div><!--/span-->
+		</div><!--/row-->
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="close();">Salir</a>
+  </div>
+</div>
+<!-- End Help Modal -->
+
+<div id="myRecentFiles" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Recent Files</h3>
+  </div>
+  <div class="modal-body">
+      <textarea id="list-text" rows="3"></textarea>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="addList();">OK</a>
+  </div>
+</div>
+
+<div id="myModal" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Replace one or all matches</h3>
+  </div>
+  <div class="modal-body">
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Search: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="search-text" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Replace With: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="replace-text" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+  </div>
+  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" onclick="close();">Cancel</a>
+		<a href="#" class="btn btn-primary" data-dismiss="modal" onclick="replaceOne();">Replace</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="replaceAll();">Replace All</a>
+  </div>
+</div>
+
+<!---AddNode--->
+<div id="AddNode" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Add Node</h3>
+  </div>
+  <div class="modal-body">
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Type: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<select id="list-type">
+					<option id="idblock" value="block">Block</option>
+					<option id="iddecision"  value="decision">Decision</option>
+					<option id="idend" value="end">End</option>
+					<option id="idstart" value="start">Start</option>
+				</select> 
+			</div>
+		</div><!--/span--> 
+	<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Label: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="labelAddNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Color: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="colorAddNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>x: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="xAddNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>y: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="yAddNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="addSelect('labelAddNode','colorAddNode','xAddNode','yAddNode');">OK</a>
+  </div>
+</div>
+
+<!--EditNode--->
+<div id="EditNode" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Edit Node</h3>
+  </div>
+  <div class="modal-body">
+  <div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Id: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="idEditNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Label: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="labelEditNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Color: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="colorEditNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>x: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="xEditNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>y: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="yEditNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+  </div>
+  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" onclick="close();">Cancel</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="editSelect('idEditNode','labelEditNode','colorEditNode','xEditNode','yEditNode');">Save</a>	
+  </div>
+</div>
+
+<!--EditLink--->
+<div id="EditLink" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Edit Link</h3>
+  </div>
+  <div class="modal-body">
+  <div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Id: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="idEditLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Label: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="labelEditLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Source: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="sourceEditLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Destiny: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="destinyEditLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Color: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="colorEditLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+  </div>
+  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" onclick="close();">Cancel</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="editLink('idEditLink','labelEditLink','sourceEditLink','destinyEditLink','colorEditLink','<link>','</link>');">Save</a>
+  </div>
+</div>
+<!---EndLinkNode--->
+
+<!-----DeleteNode--->
+<div id="DeleteNode" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Delete Node</h3>
+  </div>
+  <div class="modal-body">
+  <div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Id: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="idDeleteNode" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+  </div>
+  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" onclick="close();">Cancel</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="deleteSelect('idDeleteNode');">Save</a>
+  </div>
+</div>
+<!-----EndDeleteNode--->
+
+<!-----DeleteLink--->
+<div id="DeleteLink" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Delete Link</h3>
+  </div>
+  <div class="modal-body">
+  <div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Id: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="idDeleteLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+  </div>
+  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" onclick="close();">Cancel</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="deleteSelect('idDeleteLink');">Save</a>
+  </div>
+</div>
+<!-----EndDeleteLink--->
+
+<!-----AddLink--->
+<div id="AddLink" class="modal hide" tabindex="-1" role="dialog" 
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" 
+            aria-hidden="true">X</button>
+    <h3>Add Link</h3>
+  </div>
+  <div class="modal-body">
+  <div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Label: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="labelAddLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Source: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="sourceAddLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Destiny: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="destinyAddLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->
+		<div class="row-fluid">
+			<div class="span3" align="right">
+				<p>Color: </p>
+			</div><!--/span-->
+			<div class="span7" align="left">
+				<input class="input-large" id="colorAddLink" type="text" style="border:1px #00AACC solid;" />
+			</div><!--/span-->				
+		</div><!--/row-->	
+  </div>
+  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" onclick="close();">Cancel</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal" onclick="addLink('labelAddLink','sourceAddLink','destinyAddLink','colorAddLink');">Save</a>
+  </div>
+</div>
+<!---EndAddLink--->
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span6">
+      <textarea id="textarea" rows="24" class="span12"></textarea>
+    </div>
+    <div id="view" class="span6 well"></div>
+  </div>
+</div>
+</body>
+</html>
